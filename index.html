@@ -4,7 +4,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <title>Socket.IO chat</title>
   <style>
-      body { margin: 0; padding-bottom: 3rem; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+      /* body { margin: 0; padding-bottom: 3rem; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
 
       #form { background: rgba(0, 0, 0, 0.15); padding: 0.25rem; position: fixed; bottom: 0; left: 0; right: 0; display: flex; height: 3rem; box-sizing: border-box; backdrop-filter: blur(10px); }
       #input { border: none; padding: 0 1rem; flex-grow: 1; border-radius: 2rem; margin: 0.25rem; }
@@ -13,15 +13,18 @@
 
       #messages { list-style-type: none; margin: 0; padding: 0; }
       #messages > li { padding: 0.5rem 1rem; }
-      #messages > li:nth-child(odd) { background: #efefef; }
+      #messages > li:nth-child(odd) { background: #efefef; } */
   </style>
+  <link href="output.css" rel="stylesheet">
 </head>
 <body>
-  <h4 id="users-list">Online Users: </h4>
-  <ul id="messages"></ul>
-  <form id="form" action="">
-    <input id="input" autocomplete="off" /><button>Send</button>
-    <button id="toggle-btn">Disconnect</button>
+  <div id="users-list" class="p-4 bg-gray-100 border-b text-gray-700 font-semibold">Online Users:</div>
+  <ul id="messages" class="space-y-2 p-4 bg-gray-50">
+  </ul>
+  <form id="form" class="fixed bottom-0 left-0 right-0 flex bg-gray-800 p-3">
+    <input id="input" class="flex-grow px-4 py-2 rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Type your message..." autocomplete="off" />
+    <button class="bg-blue-600 hover:bg-blue-700 focus:ring focus:ring-blue-300 text-white px-4 py-2 rounded-lg ml-2">Send</button>
+    <button id="toggle-btn" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg ml-2">Disconnect</button>
   </form>
   <script>
     const toggleButton = document.getElementById('toggle-btn');
@@ -72,6 +75,7 @@
     socket.on('chat message', (msg, serverOffset, timestamp) => {
       const item = document.createElement('li');
       item.textContent = `[${new Date(timestamp).toLocaleTimeString()}] ${msg}`;
+      item.className = `p-2 rounded-md ${messages.children.length % 2 === 0 ? 'bg-blue-100' : 'bg-white'}`;
       messages.appendChild(item);
       window.scrollTo(0, document.body.scrollHeight);
       socket.auth.serverOffset = serverOffset;

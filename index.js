@@ -3,33 +3,33 @@ const { createServer } = require('node:http');
 const { join } = require('node:path');
 const { Server } = require('socket.io');
 const sqlite3 = require('sqlite3');
-const {open} = require('sqlite');
+const { open } = require('sqlite');
 
 async function main() {
-    // database file 
     const db = await open({
         filename: 'chat.db',
         driver: sqlite3.Database
     });
 
-    // create messages table
     await db.exec(`
         CREATE TABLE IF NOT EXISTS messages (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             client_offset TEXT UNIQUE, 
             content TEXT
         );
-    `)
-
+    `);
 
     const app = express();
     const server = createServer(app);
     const io = new Server(server, {
-    connectionStateRecovery: {}
+        connectionStateRecovery: {}
     });
 
+    // Middleware untuk file statis
+    app.use(express.static(join(__dirname, 'public')));
+
     app.get('/', (req, res) => {
-    res.sendFile(join(__dirname, 'index.html'));
+        res.sendFile(join(__dirname, 'index.html'));
     });
 
     const users = new Set();
@@ -42,32 +42,32 @@ async function main() {
             let result;
             const timestamp = new Date().toISOString();
             try {
-                // store the message to database
-                result = await db.run('INSERT INTO messages (content, client_offset) VALUES (?, ?)', msg, clientOffset);
+                result = await db.run(
+                    'INSERT INTO messages (content, client_offset) VALUES (?, ?)',
+                    msg, clientOffset
+                );
             } catch (error) {
-                if (error.errno === 19 ) { // SQLITE_CONSTRAINT
-                    // the message was already inserted, notify client
+                if (error.errno === 19) {
                     callback();
                 } else {
-                    console.error('Error store message to DB');
+                    console.error('Error storing message to DB');
                 }
                 return;
             }
 
-            // include the offeset with the message
             io.emit('chat message', msg, result.lastID, timestamp);
             callback();
         });
 
         if (!socket.recovered) {
-            // if the connection state recovery was not success
             try {
-                await db.each('SELECT id, content FROM messages WHERE id > ?', 
+                await db.each(
+                    'SELECT id, content FROM messages WHERE id > ?', 
                     [socket.handshake.auth.serverOffset || 0],
                     (_err, row) => {
                         socket.emit('chat message', row.content, row.id);
                     }
-                )
+                );
             } catch (e) {
                 console.error('Something went wrong on db.each content');
             }
@@ -81,9 +81,8 @@ async function main() {
     });
 
     server.listen(3000, () => {
-    console.log('server running at http://localhost:3000');
+        console.log('Server running at http://localhost:3000');
     });
-
 }
 
 main();
