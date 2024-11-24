@@ -32,7 +32,12 @@ async function main() {
     res.sendFile(join(__dirname, 'index.html'));
     });
 
+    const users = new Set();
+
     io.on('connection', async (socket) => {
+        users.add(socket.id);
+        io.emit('users', Array.from(users));
+
         socket.on('chat message', async (msg, clientOffset, callback) => {
             let result;
             try {
@@ -66,6 +71,12 @@ async function main() {
                 console.error('Something went wrong on db.each content');
             }
         }
+
+        socket.on('disconnect', () => {
+            console.log(`User with ID ${socket.id} disconnected`);
+            users.delete(socket.id);
+            io.emit('users', Array.from(users));
+        });
     });
 
     server.listen(3000, () => {

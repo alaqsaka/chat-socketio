@@ -17,6 +17,7 @@
   </style>
 </head>
 <body>
+  <h4 id="users-list">Online Users: </h4>
   <ul id="messages"></ul>
   <form id="form" action="">
     <input id="input" autocomplete="off" /><button>Send</button>
@@ -52,6 +53,11 @@
     const form = document.getElementById('form');
     const input = document.getElementById('input');
     const messages = document.getElementById('messages');
+    const usersList = document.getElementById('users-list');
+
+    socket.on('users', (users) => {
+      usersList.innerHTML = `Online Users: <br>${users.length}`;
+    })
 
     form.addEventListener('submit', (e) => {
       e.preventDefault();
