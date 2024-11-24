@@ -69,9 +69,9 @@
       }
     });
 
-    socket.on('chat message', (msg, serverOffset) => {
+    socket.on('chat message', (msg, serverOffset, timestamp) => {
       const item = document.createElement('li');
-      item.textContent = msg;
+      item.textContent = `[${new Date(timestamp).toLocaleTimeString()}] ${msg}`;
       messages.appendChild(item);
       window.scrollTo(0, document.body.scrollHeight);
       socket.auth.serverOffset = serverOffset;

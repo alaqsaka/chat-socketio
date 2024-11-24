@@ -40,6 +40,7 @@ async function main() {
 
         socket.on('chat message', async (msg, clientOffset, callback) => {
             let result;
+            const timestamp = new Date().toISOString();
             try {
                 // store the message to database
                 result = await db.run('INSERT INTO messages (content, client_offset) VALUES (?, ?)', msg, clientOffset);
@@ -54,7 +55,7 @@ async function main() {
             }
 
             // include the offeset with the message
-            io.emit('chat message', msg, result.lastID);
+            io.emit('chat message', msg, result.lastID, timestamp);
             callback();
         });
 
