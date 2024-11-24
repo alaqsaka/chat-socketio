@@ -94,9 +94,9 @@
       }
     });
 
-    socket.on('typing', ({ user, isTyping }) => {
-      typingIndicator.textContent = isTyping ? `${user} is typing...` : '';
-    })
+    // socket.on('typing', ({ user, isTyping }) => {
+    //   typingIndicator.textContent = isTyping ? `${user} is typing...` : '';
+    // })
 
     socket.on('users', (users) => {
       usersList.innerHTML = `Online Users: ${users.length}`;

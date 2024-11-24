@@ -35,6 +35,7 @@ async function main() {
     const users = new Set();
 
     io.on('connection', async (socket) => {
+        socket.broadcast.emit('chat message', `${socket.id} has joined the chat`);
         users.add(socket.id);
         io.emit('users', Array.from(users));
 
@@ -54,7 +55,7 @@ async function main() {
                 }
                 return;
             }
-
+            
             io.emit('chat message', msg, result.lastID, timestamp);
             callback();
         });
@@ -75,6 +76,7 @@ async function main() {
 
         socket.on('disconnect', () => {
             console.log(`User with ID ${socket.id} disconnected`);
+            socket.broadcast.emit('chat message', `${socket.id} has joined the chat`);
             users.delete(socket.id);
             io.emit('users', Array.from(users));
         });
